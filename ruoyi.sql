@@ -71,8 +71,11 @@ CREATE TABLE `attendance_info`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 49 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考勤管理表' ROW_FORMAT = DYNAMIC;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 此处省略部分内容，完整SQL文件请查看源代码
 =======
+=======
+>>>>>>> db46e43343db30478412cf8bdd7ad20bb07f8394
 -- ----------------------------
 -- Records of attendance_info
 -- ----------------------------
@@ -508,7 +511,10 @@ INSERT INTO `salary_monthly` VALUES (6, '25200018', 2025, 4, 8000.00, 18, 0, 5, 
 INSERT INTO `salary_monthly` VALUES (7, '25201019', 2025, 4, 7500.00, 20, 2, 3, 20.00, 2, 3, 6136.38, 150.00, 511.37, 1278.30, 1022.73, 1600.00, 9376.05, '0', '2025-04-26 01:23:04', '2025-04-26 09:06:56', '可以');
 INSERT INTO `salary_monthly` VALUES (8, '25200018', 2025, 5, 8000.00, 22, 3, 3, 9.00, 1, 5, 6909.16, 150.00, 1636.38, 613.71, 545.46, 2000.00, 8281.95, '0', '2025-05-01 17:53:12', '2025-05-01 22:14:59', NULL);
 INSERT INTO `salary_monthly` VALUES (10, '25201019', 2025, 5, 7500.00, 20, 2, 4, 4.00, 2, 1, 7363.62, 200.00, 0.00, 306.84, 1227.27, 1800.00, 10497.73, '0', '2025-05-01 22:17:35', '2025-05-01 23:03:40', NULL);
+<<<<<<< HEAD
 >>>>>>> 7d5ffbd (上传完整项目代码)
+=======
+>>>>>>> db46e43343db30478412cf8bdd7ad20bb07f8394
 
 -- ----------------------------
 -- Table structure for sys_config
@@ -516,10 +522,14 @@ INSERT INTO `salary_monthly` VALUES (10, '25201019', 2025, 5, 7500.00, 20, 2, 4,
 DROP TABLE IF EXISTS `sys_config`;
 CREATE TABLE `sys_config`  (
 <<<<<<< HEAD
+<<<<<<< HEAD
   `config_id` int(5) NOT NULL AUTO_INCREMENT COMMENT '参数主键',
 =======
   `config_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '参数主键',
 >>>>>>> 7d5ffbd (上传完整项目代码)
+=======
+  `config_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '参数主键',
+>>>>>>> db46e43343db30478412cf8bdd7ad20bb07f8394
   `config_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '参数名称',
   `config_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '参数键名',
   `config_value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '' COMMENT '参数键值',
@@ -531,6 +541,7 @@ CREATE TABLE `sys_config`  (
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`config_id`) USING BTREE
 <<<<<<< HEAD
+<<<<<<< HEAD
 ) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '参数配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -540,6 +551,8 @@ CREATE TABLE `sys_config`  (
 
 SET FOREIGN_KEY_CHECKS = 1;
 =======
+=======
+>>>>>>> db46e43343db30478412cf8bdd7ad20bb07f8394
 ) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '参数配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -3193,4 +3206,7 @@ INSERT INTO `system_message` VALUES (2, '员工生日提醒', '本周有3位员�
 INSERT INTO `system_message` VALUES (3, '会议通知', '周五下午14:00在会议室A举行月度工作总结会议，请准时参加。', '1', 'el-icon-date', '0', 'admin', '2023-06-03 11:15:00', '', NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;
+<<<<<<< HEAD
 >>>>>>> 7d5ffbd (上传完整项目代码)
+=======
+>>>>>>> db46e43343db30478412cf8bdd7ad20bb07f8394

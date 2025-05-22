@@ -54,7 +54,11 @@ const config = {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 module.exports = config;
 =======
 module.exports = config;
 >>>>>>> 7d5ffbd (上传完整项目代码)
+=======
+module.exports = config;
+>>>>>>> db46e43343db30478412cf8bdd7ad20bb07f8394
