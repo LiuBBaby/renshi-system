@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.attendance.mapper.AttendanceMonthlyMapper">
+    
+    <resultMap type="AttendanceMonthly" id="AttendanceMonthlyResult">
+        <result property="id"    column="id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="year"    column="year"    />
+        <result property="month"    column="month"    />
+        <result property="normalDays"    column="normal_days"    />
+        <result property="lateCount"    column="late_count"    />
+        <result property="earlyLeaveCount"    column="early_leave_count"    />
+        <result property="absenceDays"    column="absence_days"    />
+        <result property="leaveDays"    column="leave_days"    />
+        <result property="businessTripDays"    column="business_trip_days"    />
+        <result property="overtimeHours"    column="overtime_hours"    />
+        <result property="workingDays"    column="working_days"    />
+        <result property="attendanceRate"    column="attendance_rate"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectAttendanceMonthlyVo">
+        select id, emp_id, year, month, normal_days, late_count, early_leave_count, absence_days, leave_days, business_trip_days, overtime_hours, working_days, attendance_rate, create_time, update_time from attendance_monthly
+    </sql>
+
+    <select id="selectAttendanceMonthlyList" parameterType="AttendanceMonthly" resultMap="AttendanceMonthlyResult">
+        <include refid="selectAttendanceMonthlyVo"/>
+        <where>
+            <if test="empId != null  and empId != ''"> and emp_id = #{empId}</if>
+            <if test="year != null "> and year = #{year}</if>
+            <if test="month != null "> and month = #{month}</if>
+        </where>
+    </select>
+    
+    <select id="selectAttendanceMonthlyById" parameterType="Integer" resultMap="AttendanceMonthlyResult">
+        <include refid="selectAttendanceMonthlyVo"/>
+        where id = #{id}
+    </select>
+    
+     <select id="selectAttendanceMonthlyByEmpIdAndYearMonth" resultMap="AttendanceMonthlyResult">
+        <include refid="selectAttendanceMonthlyVo"/>
+        where emp_id = #{empId} and year = #{year} and month = #{month}
+    </select>
+        
+    <insert id="insertAttendanceMonthly" parameterType="AttendanceMonthly" useGeneratedKeys="true" keyProperty="id">
+        insert into attendance_monthly
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id,</if>
+            <if test="year != null">year,</if>
+            <if test="month != null">month,</if>
+            <if test="normalDays != null">normal_days,</if>
+            <if test="lateCount != null">late_count,</if>
+            <if test="earlyLeaveCount != null">early_leave_count,</if>
+            <if test="absenceDays != null">absence_days,</if>
+            <if test="leaveDays != null">leave_days,</if>
+            <if test="businessTripDays != null">business_trip_days,</if>
+            <if test="overtimeHours != null">overtime_hours,</if>
+            <if test="workingDays != null">working_days,</if>
+            <if test="attendanceRate != null">attendance_rate,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">#{empId},</if>
+            <if test="year != null">#{year},</if>
+            <if test="month != null">#{month},</if>
+            <if test="normalDays != null">#{normalDays},</if>
+            <if test="lateCount != null">#{lateCount},</if>
+            <if test="earlyLeaveCount != null">#{earlyLeaveCount},</if>
+            <if test="absenceDays != null">#{absenceDays},</if>
+            <if test="leaveDays != null">#{leaveDays},</if>
+            <if test="businessTripDays != null">#{businessTripDays},</if>
+            <if test="overtimeHours != null">#{overtimeHours},</if>
+            <if test="workingDays != null">#{workingDays},</if>
+            <if test="attendanceRate != null">#{attendanceRate},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAttendanceMonthly" parameterType="AttendanceMonthly">
+        update attendance_monthly
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id = #{empId},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="month != null">month = #{month},</if>
+            <if test="normalDays != null">normal_days = #{normalDays},</if>
+            <if test="lateCount != null">late_count = #{lateCount},</if>
+            <if test="earlyLeaveCount != null">early_leave_count = #{earlyLeaveCount},</if>
+            <if test="absenceDays != null">absence_days = #{absenceDays},</if>
+            <if test="leaveDays != null">leave_days = #{leaveDays},</if>
+            <if test="businessTripDays != null">business_trip_days = #{businessTripDays},</if>
+            <if test="overtimeHours != null">overtime_hours = #{overtimeHours},</if>
+            <if test="workingDays != null">working_days = #{workingDays},</if>
+            <if test="attendanceRate != null">attendance_rate = #{attendanceRate},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteAttendanceMonthlyById" parameterType="Integer">
+        delete from attendance_monthly where id = #{id}
+    </delete>
+
+    <delete id="deleteAttendanceMonthlyByIds" parameterType="String">
+        delete from attendance_monthly where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteAttendanceMonthlyByYearMonth">
+        delete from attendance_monthly where year = #{year} and month = #{month}
+    </delete>
+    
+    <insert id="generateMonthlyReport">
+        -- 注意：这是一个示例SQL，实际逻辑可能需要根据您的考勤规则进行调整
+        -- 需要考虑节假日、调休、请假、出差等因素
+        -- 这里的示例仅统计基本出勤、迟到、早退、加班次数
+        insert into attendance_monthly (emp_id, year, month, normal_days, late_count, early_leave_count, absence_days, leave_days, business_trip_days, overtime_hours, working_days, attendance_rate, create_time)
+        select
+            ai.emp_id,
+            #{year} as year,
+            #{month} as month,
+            count(case when ai.attendance_info_status = 0 then 1 end) as normal_days, -- 正常打卡天数 (0正常)
+            count(case when ai.attendance_info_status = 1 then 1 end) as late_count, -- 迟到次数 (1迟到)
+            count(case when ai.attendance_info_status = 2 then 1 end) as early_leave_count, -- 早退次数 (2早退)
+            count(case when ai.attendance_info_status = 4 then 1 end) as absence_days, -- 缺勤天数 (4缺勤)
+            COALESCE((select sum(DATEDIFF(examine_info_date_end, examine_info_date_begin) + 1) from examine_info ei where ei.examine_info_id = ai.emp_id and ei.examine_info_result = 2 and YEAR(ei.examine_info_date_begin) = #{year} and MONTH(ei.examine_info_date_begin) = #{month}), 0) as leave_days, -- 请假天数 (需要关联请假表)
+            COALESCE((select sum(DATEDIFF(trip_info_date_end, trip_info_date_begin) + 1) from business_trip_info bti where bti.trip_info_id = ai.emp_id and bti.trip_info_result = 2 and YEAR(bti.trip_info_date_begin) = #{year} and MONTH(bti.trip_info_date_begin) = #{month}), 0) as business_trip_days, -- 出差天数 (需要关联出差表)
+            sum(case when ai.attendance_info_status = 3 then TIMESTAMPDIFF(HOUR, ai.attendance_info_go, ai.attendance_info_out) - 8 else 0 end) as overtime_hours, -- 加班小时数 (3加班, 粗略计算)
+            DAY(LAST_DAY(STR_TO_DATE(CONCAT(#{year}, '-', #{month}, '-01'), '%Y-%m-%d'))) as working_days, -- 假设整月为工作日，需要精确计算
+            0 as attendance_rate, -- 出勤率需要根据实际规则计算
+            NOW() as create_time
+        from
+            attendance_info ai
+        where
+            YEAR(ai.attendance_info_date) = #{year} and MONTH(ai.attendance_info_date) = #{month}
+        group by
+            ai.emp_id;
+            
+        -- 更新出勤率 (示例: 正常天数/应出勤天数, 需要精确计算应出勤天数)
+        UPDATE attendance_monthly am
+        SET attendance_rate = (am.normal_days / am.working_days) * 100
+        WHERE year = #{year} and month = #{month} and am.working_days > 0;
+    </insert>
+
+</mapper> 

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.BusinessTripInfoMapper">
+    
+    <resultMap type="com.ruoyi.business.domain.BusinessTripInfo" id="BusinessTripInfoResult">
+        <result property="id"                column="id"                 />
+        <result property="tripInfoDateBegin" column="trip_info_date_begin"  />
+        <result property="tripInfoDateEnd"   column="trip_info_date_end"    />
+        <result property="tripInfoId"        column="trip_info_id"         />
+        <result property="tripInfoName"      column="trip_info_name"       />
+        <result property="tripInfoDept"      column="trip_info_dept"       />
+        <result property="tripInfoDestination" column="trip_info_destination" />
+        <result property="tripInfoReason"    column="trip_info_reason"     />
+        <result property="tripInfoPeople"    column="trip_info_people"     />
+        <result property="tripInfoResult"    column="trip_info_result"     />
+        <result property="createTime"        column="create_time"         />
+        <result property="firstApprovalTime" column="first_approval_time"  />
+        <result property="approvalTime"      column="approval_time"       />
+        <result property="userId"            column="user_id"             />
+        <result property="remark"            column="remark"              />
+    </resultMap>
+
+    <sql id="selectBusinessTripInfoVo">
+        select id, trip_info_date_begin, trip_info_date_end, trip_info_id, trip_info_name, trip_info_dept, trip_info_destination, 
+               trip_info_reason, trip_info_people, trip_info_result, create_time, first_approval_time, approval_time, user_id, remark
+        from business_trip_info
+    </sql>
+
+    <select id="selectBusinessTripInfoList" parameterType="com.ruoyi.business.domain.BusinessTripInfo" resultMap="BusinessTripInfoResult">
+        <include refid="selectBusinessTripInfoVo"/>
+        <where>  
+            <if test="tripInfoId != null  and tripInfoId != ''"> and trip_info_id = #{tripInfoId}</if>
+            <if test="tripInfoName != null  and tripInfoName != ''"> and trip_info_name like concat('%', #{tripInfoName}, '%')</if>
+            <if test="tripInfoDept != null  and tripInfoDept != ''"> and trip_info_dept like concat('%', #{tripInfoDept}, '%')</if>
+            <if test="tripInfoDestination != null  and tripInfoDestination != ''"> and trip_info_destination like concat('%', #{tripInfoDestination}, '%')</if>
+            <if test="tripInfoReason != null  and tripInfoReason != ''"> and trip_info_reason like concat('%', #{tripInfoReason}, '%')</if>
+            <if test="tripInfoPeople != null  and tripInfoPeople != ''"> and trip_info_people = #{tripInfoPeople}</if>
+            <if test="tripInfoResult != null "> and trip_info_result = #{tripInfoResult}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <choose>
+                <!-- 如果是普通员工,只能查看自己的申请 -->
+                <when test="params.roleKey != null and params.roleKey == 'user'">
+                    and trip_info_id = #{params.empId}
+                </when>
+                <!-- 如果是组长,可以查看自己的出差列表 + 自己能审批的员工出差列表 -->
+                <when test="params.roleKey != null and params.roleKey == 'group'">
+                    and (
+                        trip_info_id = #{params.empId}
+                        or (
+                            exists (
+                                select 1 from emp_info ei 
+                                left join sys_dept sd on ei.dept_id = sd.dept_id
+                                left join sys_user_role sur on ei.user_id = sur.user_id
+                                left join sys_role sr on sur.role_id = sr.role_id
+                                where 
+                                    ei.emp_info_id = trip_info_id
+                                    and (
+                                        ei.dept_id = #{params.deptId} 
+                                        or sd.parent_id = #{params.deptId}
+                                    )
+                                    and (sr.role_key != 'group' and sr.role_key != 'manager' and sr.role_key != 'admin')
+                            )
+                        )
+                    )
+                </when>
+                <!-- 如果是经理,可以查看自己的出差记录、下属组长的出差记录和组长已审批的员工出差记录 -->
+                <when test="params.roleKey != null and params.roleKey == 'manager'">
+                    and (
+                        trip_info_id = #{params.empId}
+                        or (
+                            trip_info_result = 1
+                            and exists (
+                                select 1 from emp_info ei
+                                join sys_dept sd on ei.dept_id = sd.dept_id
+                                left join sys_user_role sur on ei.user_id = sur.user_id
+                                left join sys_role sr on sur.role_id = sr.role_id
+                                where ei.emp_info_id = trip_info_id
+                                and (
+                                    sd.ancestors like concat('%,', #{params.deptId}, ',%')
+                                    or sd.dept_id = #{params.deptId}
+                                    or sd.parent_id = #{params.deptId}
+                                )
+                                and (sr.role_key = 'user' or sr.role_key is null)
+                            )
+                        )
+                        or exists (
+                            select 1 from emp_info ei
+                            join sys_user_role sur on ei.user_id = sur.user_id
+                            join sys_role sr on sur.role_id = sr.role_id
+                            join sys_dept sd on ei.dept_id = sd.dept_id
+                            where ei.emp_info_id = trip_info_id
+                            and sr.role_key = 'group'
+                            and (
+                                sd.parent_id = #{params.deptId}
+                                or sd.dept_id = #{params.deptId}
+                            )
+                        )
+                    )
+                </when>
+                <!-- 如果是管理员,可以查看所有记录 -->
+                <when test="params.roleKey != null and params.roleKey == 'admin'">
+                    and exists (
+                        select 1 from emp_info ei
+                        join sys_user_role sur on ei.user_id = sur.user_id
+                        join sys_role sr on sur.role_id = sr.role_id
+                        where ei.emp_info_id = trip_info_id
+                        and (sr.role_key = 'manager' or sr.role_key = 'admin')
+                    )
+                </when>
+            </choose>
+            <if test="params.beginTripInfoDateBegin != null and params.beginTripInfoDateBegin != '' and params.endTripInfoDateBegin != null and params.endTripInfoDateBegin != ''"> 
+                and trip_info_date_begin between #{params.beginTripInfoDateBegin} and #{params.endTripInfoDateBegin}
+            </if>
+            <if test="params.beginTripInfoDateEnd != null and params.beginTripInfoDateEnd != '' and params.endTripInfoDateEnd != null and params.endTripInfoDateEnd != ''"> 
+                and trip_info_date_end between #{params.beginTripInfoDateEnd} and #{params.endTripInfoDateEnd}
+            </if>
+            ${params.dataScope}
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectBusinessTripInfoById" parameterType="Integer" resultMap="BusinessTripInfoResult">
+        <include refid="selectBusinessTripInfoVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectBusinessTripInfoByEmpId" parameterType="String" resultMap="BusinessTripInfoResult">
+        <include refid="selectBusinessTripInfoVo"/>
+        where trip_info_id = #{tripInfoId}
+        order by create_time desc
+    </select>
+    
+    <select id="countBusinessTripDays" resultType="int">
+        SELECT COALESCE(SUM(DATEDIFF(trip_info_date_end, trip_info_date_begin) + 1), 0) as days
+        FROM business_trip_info
+        WHERE trip_info_id = #{empId} 
+          AND trip_info_result = 2
+          AND (
+            (trip_info_date_begin BETWEEN #{startDate} AND #{endDate})
+            OR (trip_info_date_end BETWEEN #{startDate} AND #{endDate})
+            OR (trip_info_date_begin &lt;= #{startDate} AND trip_info_date_end >= #{endDate})
+          )
+    </select>
+    
+    <!-- 根据部门ID列表查询出差申请 -->
+    <select id="selectBusinessTripInfoByDeptIds" resultMap="BusinessTripInfoResult">
+        SELECT
+            b.id,
+            b.trip_info_date_begin,
+            b.trip_info_date_end,
+            b.trip_info_id,
+            b.trip_info_name,
+            b.trip_info_dept,
+            b.trip_info_destination,
+            b.trip_info_reason,
+            b.trip_info_people,
+            b.trip_info_result,
+            b.create_time,
+            b.first_approval_time,
+            b.approval_time,
+            b.user_id,
+            b.remark
+        FROM
+            business_trip_info b
+        LEFT JOIN emp_info e ON b.trip_info_id = e.emp_info_id
+        <where>
+            <!-- 基本查询条件 -->
+            <if test="businessTripInfo.tripInfoId != null and businessTripInfo.tripInfoId != ''"> and b.trip_info_id = #{businessTripInfo.tripInfoId}</if>
+            <if test="businessTripInfo.tripInfoName != null and businessTripInfo.tripInfoName != ''"> and b.trip_info_name like concat('%', #{businessTripInfo.tripInfoName}, '%')</if>
+            <if test="businessTripInfo.tripInfoDept != null and businessTripInfo.tripInfoDept != ''"> and b.trip_info_dept like concat('%', #{businessTripInfo.tripInfoDept}, '%')</if>
+            <if test="businessTripInfo.tripInfoDestination != null and businessTripInfo.tripInfoDestination != ''"> and b.trip_info_destination like concat('%', #{businessTripInfo.tripInfoDestination}, '%')</if>
+            <if test="businessTripInfo.tripInfoReason != null and businessTripInfo.tripInfoReason != ''"> and b.trip_info_reason like concat('%', #{businessTripInfo.tripInfoReason}, '%')</if>
+            <if test="businessTripInfo.tripInfoPeople != null and businessTripInfo.tripInfoPeople != ''"> and b.trip_info_people = #{businessTripInfo.tripInfoPeople}</if>
+            <if test="businessTripInfo.tripInfoResult != null"> and b.trip_info_result = #{businessTripInfo.tripInfoResult}</if>
+            <if test="businessTripInfo.userId != null"> and b.user_id = #{businessTripInfo.userId}</if>
+            
+            <!-- 部门筛选条件 -->
+            <if test="deptIds != null and deptIds.size() > 0">
+                and e.dept_id in
+                <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY b.create_time DESC
+    </select>
+        
+    <insert id="insertBusinessTripInfo" parameterType="com.ruoyi.business.domain.BusinessTripInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into business_trip_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tripInfoDateBegin != null">trip_info_date_begin,</if>
+            <if test="tripInfoDateEnd != null">trip_info_date_end,</if>
+            <if test="tripInfoId != null and tripInfoId != ''">trip_info_id,</if>
+            <if test="tripInfoName != null and tripInfoName != ''">trip_info_name,</if>
+            <if test="tripInfoDept != null and tripInfoDept != ''">trip_info_dept,</if>
+            <if test="tripInfoDestination != null and tripInfoDestination != ''">trip_info_destination,</if>
+            <if test="tripInfoReason != null and tripInfoReason != ''">trip_info_reason,</if>
+            <if test="tripInfoPeople != null and tripInfoPeople != ''">trip_info_people,</if>
+            <if test="tripInfoResult != null">trip_info_result,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="firstApprovalTime != null">first_approval_time,</if>
+            <if test="approvalTime != null">approval_time,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tripInfoDateBegin != null">#{tripInfoDateBegin},</if>
+            <if test="tripInfoDateEnd != null">#{tripInfoDateEnd},</if>
+            <if test="tripInfoId != null and tripInfoId != ''">#{tripInfoId},</if>
+            <if test="tripInfoName != null and tripInfoName != ''">#{tripInfoName},</if>
+            <if test="tripInfoDept != null and tripInfoDept != ''">#{tripInfoDept},</if>
+            <if test="tripInfoDestination != null and tripInfoDestination != ''">#{tripInfoDestination},</if>
+            <if test="tripInfoReason != null and tripInfoReason != ''">#{tripInfoReason},</if>
+            <if test="tripInfoPeople != null and tripInfoPeople != ''">#{tripInfoPeople},</if>
+            <if test="tripInfoResult != null">#{tripInfoResult},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="firstApprovalTime != null">#{firstApprovalTime},</if>
+            <if test="approvalTime != null">#{approvalTime},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBusinessTripInfo" parameterType="com.ruoyi.business.domain.BusinessTripInfo">
+        update business_trip_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tripInfoDateBegin != null">trip_info_date_begin = #{tripInfoDateBegin},</if>
+            <if test="tripInfoDateEnd != null">trip_info_date_end = #{tripInfoDateEnd},</if>
+            <if test="tripInfoId != null and tripInfoId != ''">trip_info_id = #{tripInfoId},</if>
+            <if test="tripInfoName != null and tripInfoName != ''">trip_info_name = #{tripInfoName},</if>
+            <if test="tripInfoDept != null and tripInfoDept != ''">trip_info_dept = #{tripInfoDept},</if>
+            <if test="tripInfoDestination != null and tripInfoDestination != ''">trip_info_destination = #{tripInfoDestination},</if>
+            <if test="tripInfoReason != null and tripInfoReason != ''">trip_info_reason = #{tripInfoReason},</if>
+            <if test="tripInfoPeople != null and tripInfoPeople != ''">trip_info_people = #{tripInfoPeople},</if>
+            <if test="tripInfoResult != null">trip_info_result = #{tripInfoResult},</if>
+            <if test="firstApprovalTime != null">first_approval_time = #{firstApprovalTime},</if>
+            <if test="approvalTime != null">approval_time = #{approvalTime},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBusinessTripInfoById" parameterType="Integer">
+        delete from business_trip_info where id = #{id}
+    </delete>
+
+    <delete id="deleteBusinessTripInfoByIds" parameterType="String">
+        delete from business_trip_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper> 

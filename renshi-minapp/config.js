@@ -53,4 +53,8 @@ const config = {
   }
 };
 
+<<<<<<< HEAD
 module.exports = config;
+=======
+module.exports = config;
+>>>>>>> 7d5ffbd (上传完整项目代码)

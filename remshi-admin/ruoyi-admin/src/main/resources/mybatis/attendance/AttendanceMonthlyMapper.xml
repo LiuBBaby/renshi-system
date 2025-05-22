@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.attendance.mapper.AttendanceMonthlyMapper">
+    
+    <resultMap type="com.ruoyi.attendance.domain.AttendanceMonthly" id="AttendanceMonthlyResult">
+        <result property="id"                column="id"                />
+        <result property="empId"             column="emp_id"            />
+        <result property="year"              column="year"              />
+        <result property="month"             column="month"             />
+        <result property="normalDays"        column="normal_days"       />
+        <result property="lateCount"         column="late_count"        />
+        <result property="earlyLeaveCount"   column="early_leave_count" />
+        <result property="absenceDays"       column="absence_days"      />
+        <result property="leaveDays"         column="leave_days"        />
+        <result property="businessTripDays"  column="business_trip_days"/>
+        <result property="overtimeHours"     column="overtime_hours"    />
+        <result property="workingDays"       column="working_days"      />
+        <result property="attendanceRate"    column="attendance_rate"   />
+        <result property="createTime"        column="create_time"       />
+        <result property="updateTime"        column="update_time"       />
+    </resultMap>
+
+    <sql id="selectAttendanceMonthlyVo">
+        select id, emp_id, year, month, normal_days, late_count, early_leave_count, absence_days, 
+               leave_days, business_trip_days, overtime_hours, working_days, attendance_rate, 
+               create_time, update_time
+        from attendance_monthly
+    </sql>
+
+    <select id="selectAttendanceMonthlyList" parameterType="com.ruoyi.attendance.domain.AttendanceMonthly" resultMap="AttendanceMonthlyResult">
+        <include refid="selectAttendanceMonthlyVo"/>
+        <where>  
+            <if test="empId != null  and empId != ''"> and emp_id = #{empId}</if>
+            <if test="year != null "> and year = #{year}</if>
+            <if test="month != null "> and month = #{month}</if>
+            <if test="normalDays != null "> and normal_days = #{normalDays}</if>
+            <if test="lateCount != null "> and late_count = #{lateCount}</if>
+            <if test="earlyLeaveCount != null "> and early_leave_count = #{earlyLeaveCount}</if>
+            <if test="absenceDays != null "> and absence_days = #{absenceDays}</if>
+            <if test="leaveDays != null "> and leave_days = #{leaveDays}</if>
+            <if test="businessTripDays != null "> and business_trip_days = #{businessTripDays}</if>
+            <if test="overtimeHours != null "> and overtime_hours = #{overtimeHours}</if>
+            <if test="workingDays != null "> and working_days = #{workingDays}</if>
+            <if test="attendanceRate != null "> and attendance_rate = #{attendanceRate}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by year desc, month desc
+    </select>
+    
+    <select id="selectAttendanceMonthlyById" parameterType="Integer" resultMap="AttendanceMonthlyResult">
+        <include refid="selectAttendanceMonthlyVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectAttendanceMonthlyByEmpIdAndYearMonth" resultMap="AttendanceMonthlyResult">
+        <include refid="selectAttendanceMonthlyVo"/>
+        where emp_id = #{empId} and year = #{year} and month = #{month}
+    </select>
+        
+    <insert id="insertAttendanceMonthly" parameterType="com.ruoyi.attendance.domain.AttendanceMonthly" useGeneratedKeys="true" keyProperty="id">
+        insert into attendance_monthly
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empId != null">emp_id,</if>
+            <if test="year != null">year,</if>
+            <if test="month != null">month,</if>
+            <if test="normalDays != null">normal_days,</if>
+            <if test="lateCount != null">late_count,</if>
+            <if test="earlyLeaveCount != null">early_leave_count,</if>
+            <if test="absenceDays != null">absence_days,</if>
+            <if test="leaveDays != null">leave_days,</if>
+            <if test="businessTripDays != null">business_trip_days,</if>
+            <if test="overtimeHours != null">overtime_hours,</if>
+            <if test="workingDays != null">working_days,</if>
+            <if test="attendanceRate != null">attendance_rate,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empId != null">#{empId},</if>
+            <if test="year != null">#{year},</if>
+            <if test="month != null">#{month},</if>
+            <if test="normalDays != null">#{normalDays},</if>
+            <if test="lateCount != null">#{lateCount},</if>
+            <if test="earlyLeaveCount != null">#{earlyLeaveCount},</if>
+            <if test="absenceDays != null">#{absenceDays},</if>
+            <if test="leaveDays != null">#{leaveDays},</if>
+            <if test="businessTripDays != null">#{businessTripDays},</if>
+            <if test="overtimeHours != null">#{overtimeHours},</if>
+            <if test="workingDays != null">#{workingDays},</if>
+            <if test="attendanceRate != null">#{attendanceRate},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAttendanceMonthly" parameterType="com.ruoyi.attendance.domain.AttendanceMonthly">
+        update attendance_monthly
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empId != null">emp_id = #{empId},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="month != null">month = #{month},</if>
+            <if test="normalDays != null">normal_days = #{normalDays},</if>
+            <if test="lateCount != null">late_count = #{lateCount},</if>
+            <if test="earlyLeaveCount != null">early_leave_count = #{earlyLeaveCount},</if>
+            <if test="absenceDays != null">absence_days = #{absenceDays},</if>
+            <if test="leaveDays != null">leave_days = #{leaveDays},</if>
+            <if test="businessTripDays != null">business_trip_days = #{businessTripDays},</if>
+            <if test="overtimeHours != null">overtime_hours = #{overtimeHours},</if>
+            <if test="workingDays != null">working_days = #{workingDays},</if>
+            <if test="attendanceRate != null">attendance_rate = #{attendanceRate},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteAttendanceMonthlyById" parameterType="Integer">
+        delete from attendance_monthly where id = #{id}
+    </delete>
+
+    <delete id="deleteAttendanceMonthlyByIds" parameterType="String">
+        delete from attendance_monthly where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 生成月度考勤报表 -->
+    <insert id="generateMonthlyReport">
+        INSERT INTO attendance_monthly (
+            emp_id, year, month, normal_days, late_count, early_leave_count, 
+            absence_days, leave_days, business_trip_days, overtime_hours, 
+            working_days, attendance_rate, create_time, update_time
+        )
+        SELECT 
+            e.emp_id, 
+            #{year} as year, 
+            #{month} as month,
+            count(case when a.attendance_info_status = 0 then 1 end) as normal_days,
+            count(case when a.attendance_info_status = 1 then 1 end) as late_count,
+            count(case when a.attendance_info_status = 2 then 1 end) as early_leave_count,
+            count(case when a.attendance_info_status = 4 then 1 end) as absence_days,
+            (SELECT count(*) FROM examine_info 
+                WHERE examine_info_id = e.emp_id 
+                AND examine_info_result = 2
+                AND YEAR(examine_info_date_begin) = #{year} 
+                AND MONTH(examine_info_date_begin) = #{month}) as leave_days,
+            (SELECT count(*) FROM business_trip_info 
+                WHERE trip_info_id = e.emp_id 
+                AND trip_info_result = 2
+                AND YEAR(trip_info_date_begin) = #{year} 
+                AND MONTH(trip_info_date_begin) = #{month}) as business_trip_days,
+            COALESCE(SUM(
+                CASE WHEN a.attendance_info_status = 3 
+                THEN TIMESTAMPDIFF(HOUR, 
+                    GREATEST(a.attendance_info_out, DATE_FORMAT(CONCAT(DATE(a.attendance_info_out), ' 18:30:00'), '%Y-%m-%d %H:%i:%s')), 
+                    a.attendance_info_out)
+                ELSE 0 END
+            ), 0) as overtime_hours,
+            (
+                SELECT 
+                    (DATEDIFF(LAST_DAY(CONCAT(#{year}, '-', #{month}, '-01')), CONCAT(#{year}, '-', #{month}, '-01')) + 1) 
+                    - (
+                        SELECT COUNT(*) FROM (
+                            SELECT holiday FROM json_table(
+                                (SELECT param_value FROM attendance_config WHERE param_key = 'holiday_list'),
+                                '$[*]' COLUMNS (holiday DATE PATH '$')
+                            ) as holidays
+                            WHERE YEAR(holiday) = #{year} AND MONTH(holiday) = #{month}
+                        ) h
+                    )
+                    + (
+                        SELECT COUNT(*) FROM (
+                            SELECT workday FROM json_table(
+                                (SELECT param_value FROM attendance_config WHERE param_key = 'workday_list'),
+                                '$[*]' COLUMNS (workday DATE PATH '$')
+                            ) as workdays
+                            WHERE YEAR(workday) = #{year} AND MONTH(workday) = #{month}
+                        ) w
+                    )
+            ) as working_days,
+            ROUND(
+                count(case when a.attendance_info_status = 0 then 1 end) * 100.0 / 
+                NULLIF(
+                    (
+                        SELECT 
+                            (DATEDIFF(LAST_DAY(CONCAT(#{year}, '-', #{month}, '-01')), CONCAT(#{year}, '-', #{month}, '-01')) + 1)
+                            - (
+                                SELECT COUNT(*) FROM (
+                                    SELECT holiday FROM json_table(
+                                        (SELECT param_value FROM attendance_config WHERE param_key = 'holiday_list'),
+                                        '$[*]' COLUMNS (holiday DATE PATH '$')
+                                    ) as holidays
+                                    WHERE YEAR(holiday) = #{year} AND MONTH(holiday) = #{month}
+                                ) h
+                            )
+                            + (
+                                SELECT COUNT(*) FROM (
+                                    SELECT workday FROM json_table(
+                                        (SELECT param_value FROM attendance_config WHERE param_key = 'workday_list'),
+                                        '$[*]' COLUMNS (workday DATE PATH '$')
+                                    ) as workdays
+                                    WHERE YEAR(workday) = #{year} AND MONTH(workday) = #{month}
+                                ) w
+                            )
+                    ), 0
+                ),
+                2
+            ) as attendance_rate,
+            NOW() as create_time,
+            NOW() as update_time
+        FROM 
+            emp_info e
+        LEFT JOIN 
+            attendance_info a ON e.emp_id = a.emp_id 
+                AND YEAR(a.attendance_info_date) = #{year} 
+                AND MONTH(a.attendance_info_date) = #{month}
+        WHERE 
+            e.status = 0  -- 在职员工
+        GROUP BY 
+            e.emp_id
+        ON DUPLICATE KEY UPDATE
+            normal_days = VALUES(normal_days),
+            late_count = VALUES(late_count),
+            early_leave_count = VALUES(early_leave_count),
+            absence_days = VALUES(absence_days),
+            leave_days = VALUES(leave_days),
+            business_trip_days = VALUES(business_trip_days),
+            overtime_hours = VALUES(overtime_hours),
+            working_days = VALUES(working_days),
+            attendance_rate = VALUES(attendance_rate),
+            update_time = NOW()
+    </insert>
+    
+</mapper> 
