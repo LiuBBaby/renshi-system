@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.salary.mapper.SalaryBaseInfoMapper">
+    
+    <resultMap type="SalaryBaseInfo" id="SalaryBaseInfoResult">
+        <result property="empId"    column="emp_id"    />
+        <result property="baseSalary"    column="base_salary"    />
+        <result property="standardAttendanceDays"    column="standard_attendance_days"    />
+        <result property="hourSalary"    column="hour_salary"    />
+        <result property="daySalary"    column="day_salary"    />
+        <result property="performanceBase"    column="performance_base"    />
+        <result property="lateDeduction"    column="late_deduction"    />
+        <result property="absenceDeductionRatio"    column="absence_deduction_ratio"    />
+        <result property="overtimeRatio"    column="overtime_ratio"    />
+        <result property="businessTripRatio"    column="business_trip_ratio"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="empName"    column="emp_name"    />
+        <result property="deptName"    column="dept_name"    />
+    </resultMap>
+
+    <sql id="selectSalaryBaseInfoVo">
+        select sbi.emp_id, sbi.base_salary, sbi.standard_attendance_days, sbi.hour_salary, sbi.day_salary, 
+        sbi.performance_base, sbi.late_deduction, sbi.absence_deduction_ratio, sbi.overtime_ratio, 
+        sbi.business_trip_ratio, sbi.create_time, sbi.update_time, sbi.remark from salary_base_info sbi
+    </sql>
+    
+    <sql id="selectSalaryBaseInfoWithEmpVo">
+        select sbi.emp_id, sbi.base_salary, sbi.standard_attendance_days, sbi.hour_salary, sbi.day_salary, 
+        sbi.performance_base, sbi.late_deduction, sbi.absence_deduction_ratio, sbi.overtime_ratio, 
+        sbi.business_trip_ratio, sbi.create_time, sbi.update_time, sbi.remark,
+        ei.emp_info_name as emp_name, d.dept_name
+        from salary_base_info sbi
+        left join emp_info ei on sbi.emp_id = ei.emp_info_id
+        left join sys_dept d on ei.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectSalaryBaseInfoList" parameterType="SalaryBaseInfo" resultMap="SalaryBaseInfoResult">
+        <include refid="selectSalaryBaseInfoWithEmpVo"/>
+        <where>
+            <if test="empId != null  and empId != ''"> and sbi.emp_id = #{empId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSalaryBaseInfoByEmpId" parameterType="String" resultMap="SalaryBaseInfoResult">
+        <include refid="selectSalaryBaseInfoWithEmpVo"/>
+        where sbi.emp_id = #{empId}
+    </select>
+        
+    <insert id="insertSalaryBaseInfo" parameterType="SalaryBaseInfo">
+        insert into salary_base_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id,</if>
+            <if test="baseSalary != null">base_salary,</if>
+            <if test="standardAttendanceDays != null">standard_attendance_days,</if>
+            <if test="hourSalary != null">hour_salary,</if>
+            <if test="daySalary != null">day_salary,</if>
+            <if test="performanceBase != null">performance_base,</if>
+            <if test="lateDeduction != null">late_deduction,</if>
+            <if test="absenceDeductionRatio != null">absence_deduction_ratio,</if>
+            <if test="overtimeRatio != null">overtime_ratio,</if>
+            <if test="businessTripRatio != null">business_trip_ratio,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">#{empId},</if>
+            <if test="baseSalary != null">#{baseSalary},</if>
+            <if test="standardAttendanceDays != null">#{standardAttendanceDays},</if>
+            <if test="hourSalary != null">#{hourSalary},</if>
+            <if test="daySalary != null">#{daySalary},</if>
+            <if test="performanceBase != null">#{performanceBase},</if>
+            <if test="lateDeduction != null">#{lateDeduction},</if>
+            <if test="absenceDeductionRatio != null">#{absenceDeductionRatio},</if>
+            <if test="overtimeRatio != null">#{overtimeRatio},</if>
+            <if test="businessTripRatio != null">#{businessTripRatio},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSalaryBaseInfo" parameterType="SalaryBaseInfo">
+        update salary_base_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="baseSalary != null">base_salary = #{baseSalary},</if>
+            <if test="standardAttendanceDays != null">standard_attendance_days = #{standardAttendanceDays},</if>
+            <if test="hourSalary != null">hour_salary = #{hourSalary},</if>
+            <if test="daySalary != null">day_salary = #{daySalary},</if>
+            <if test="performanceBase != null">performance_base = #{performanceBase},</if>
+            <if test="lateDeduction != null">late_deduction = #{lateDeduction},</if>
+            <if test="absenceDeductionRatio != null">absence_deduction_ratio = #{absenceDeductionRatio},</if>
+            <if test="overtimeRatio != null">overtime_ratio = #{overtimeRatio},</if>
+            <if test="businessTripRatio != null">business_trip_ratio = #{businessTripRatio},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where emp_id = #{empId}
+    </update>
+
+    <delete id="deleteSalaryBaseInfoByEmpId" parameterType="String">
+        delete from salary_base_info where emp_id = #{empId}
+    </delete>
+
+    <delete id="deleteSalaryBaseInfoByEmpIds" parameterType="String">
+        delete from salary_base_info where emp_id in 
+        <foreach item="empId" collection="array" open="(" separator="," close=")">
+            #{empId}
+        </foreach>
+    </delete>
+</mapper> 

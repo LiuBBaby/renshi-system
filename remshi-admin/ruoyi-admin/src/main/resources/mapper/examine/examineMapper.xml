@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.examine.mapper.examineMapper">
+    
+    <resultMap type="examine" id="examineResult">
+        <result property="id"    column="id"    />
+        <result property="examineInfoDateBegin"    column="examine_info_date_begin"    />
+        <result property="examineInfoDateEnd"    column="examine_info_date_end"    />
+        <result property="examineInfoId"    column="examine_info_id"    />
+        <result property="leaveType"    column="leave_type"    />
+        <result property="examineInfoName"    column="examine_info_name"    />
+        <result property="examineInfoDept"    column="examine_info_dept"    />
+        <result property="examineInfoReason"    column="examine_info_reason"    />
+        <result property="examineInfoPeople"    column="examine_info_people"    />
+        <result property="examineInfoResult"    column="examine_info_result"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="firstApprovalTime"    column="first_approval_time"    />
+        <result property="approvalTime"    column="approval_time"    />
+        <result property="userId"    column="user_id"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectexamineVo">
+        select id, examine_info_date_begin, examine_info_date_end, examine_info_id, leave_type, examine_info_name, examine_info_dept, examine_info_reason, examine_info_people, examine_info_result, create_time, first_approval_time, approval_time, user_id, remark from examine_info
+    </sql>
+
+    <select id="selectexamineList" parameterType="examine" resultMap="examineResult">
+        SELECT
+            e.id,
+            e.examine_info_date_begin,
+            e.examine_info_date_end,
+            e.examine_info_id,
+            e.leave_type,
+            e.examine_info_name,
+            e.examine_info_dept,
+            e.examine_info_reason,
+            e.examine_info_people,
+            e.examine_info_result,
+            e.create_time,
+            e.first_approval_time,
+            e.approval_time,
+            e.user_id,
+            e.remark
+        FROM
+            examine_info e
+        <where>
+            <if test="id != null and id != ''"> and e.id = #{id}</if>
+            <if test="examineInfoDateBegin != null "> and e.examine_info_date_begin = #{examineInfoDateBegin}</if>
+            <if test="examineInfoDateEnd != null "> and e.examine_info_date_end = #{examineInfoDateEnd}</if>
+            <if test="examineInfoId != null and examineInfoId != ''"> and e.examine_info_id = #{examineInfoId}</if>
+            <if test="leaveType != null and leaveType != ''"> and e.leave_type = #{leaveType}</if>
+            <if test="examineInfoName != null and examineInfoName != ''"> and e.examine_info_name like concat('%', #{examineInfoName}, '%')</if>
+            <if test="examineInfoDept != null and examineInfoDept != ''"> and e.examine_info_dept like concat('%', #{examineInfoDept}, '%')</if>
+            <if test="examineInfoReason != null and examineInfoReason != ''"> and e.examine_info_reason like concat('%', #{examineInfoReason}, '%')</if>
+            <if test="examineInfoPeople != null and examineInfoPeople != ''"> and e.examine_info_people = #{examineInfoPeople}</if>
+            <if test="examineInfoResult != null "> and e.examine_info_result = #{examineInfoResult}</if>
+            <if test="userId != null "> and e.user_id = #{userId}</if>
+            <choose>
+                <!-- 如果是普通员工,只能查看自己的申请 -->
+                <when test="params.roleKey != null and params.roleKey == 'user'">
+                    and e.examine_info_id = #{params.empId}
+                </when>
+                <!-- 如果是组长,可以查看自己的请假列表 + 自己能审批的员工请假列表 -->
+                <when test="params.roleKey != null and params.roleKey == 'group'">
+                    and (
+                        e.examine_info_id = #{params.empId}
+                        or (
+                            exists (
+                                select 1 from emp_info ei 
+                                left join sys_dept sd on ei.dept_id = sd.dept_id
+                                left join sys_user_role sur on ei.user_id = sur.user_id
+                                left join sys_role sr on sur.role_id = sr.role_id
+                                where 
+                                    ei.emp_info_id = e.examine_info_id
+                                    and (
+                                        ei.dept_id = #{params.deptId} 
+                                        or sd.parent_id = #{params.deptId}
+                                    )
+                                    and (sr.role_key != 'group' and sr.role_key != 'manager' and sr.role_key != 'admin')
+                            )
+                        )
+                    )
+                </when>
+                <!-- 如果是经理,可以查看自己的请假记录、下属组长的请假记录和组长已审批的员工请假记录 -->
+                <when test="params.roleKey != null and params.roleKey == 'manager'">
+                    and (
+                        e.examine_info_id = #{params.empId}
+                        or (
+                            e.examine_info_result = 1 
+                            and exists (
+                                select 1 from emp_info ei
+                                join sys_dept sd on ei.dept_id = sd.dept_id
+                                left join sys_user_role sur on ei.user_id = sur.user_id
+                                left join sys_role sr on sur.role_id = sr.role_id
+                                where ei.emp_info_id = e.examine_info_id
+                                and (
+                                    sd.ancestors like concat('%,', #{params.deptId}, ',%')
+                                    or sd.dept_id = #{params.deptId}
+                                    or sd.parent_id = #{params.deptId}
+                                )
+                                and (sr.role_key = 'user' or sr.role_key is null)
+                            )
+                        )
+                        or exists (
+                            select 1 from emp_info ei
+                            join sys_user_role sur on ei.user_id = sur.user_id
+                            join sys_role sr on sur.role_id = sr.role_id
+                            join sys_dept sd on ei.dept_id = sd.dept_id
+                            where ei.emp_info_id = e.examine_info_id
+                            and sr.role_key = 'group'
+                            and (
+                                sd.parent_id = #{params.deptId}
+                                or sd.dept_id = #{params.deptId}
+                            )
+                        )
+                    )
+                </when>
+                <!-- 如果是管理员,只查看部门经理及以上的请假记录 -->
+                <when test="params.roleKey != null and params.roleKey == 'admin'">
+                    and exists (
+                        select 1 from emp_info ei
+                        join sys_user_role sur on ei.user_id = sur.user_id
+                        join sys_role sr on sur.role_id = sr.role_id
+                        where ei.emp_info_id = e.examine_info_id
+                        and (sr.role_key = 'manager' or sr.role_key = 'admin')
+                    )
+                </when>
+            </choose>
+        </where>
+        ORDER BY e.create_time DESC
+    </select>
+    
+    <select id="selectexamineById" parameterType="Long" resultMap="examineResult">
+        <include refid="selectexamineVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertexamine" parameterType="examine" useGeneratedKeys="true" keyProperty="id">
+        insert into examine_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="examineInfoDateBegin != null">examine_info_date_begin,</if>
+            <if test="examineInfoDateEnd != null">examine_info_date_end,</if>
+            <if test="examineInfoId != null">examine_info_id,</if>
+            <if test="leaveType != null">leave_type,</if>
+            <if test="examineInfoName != null">examine_info_name,</if>
+            <if test="examineInfoDept != null">examine_info_dept,</if>
+            <if test="examineInfoReason != null">examine_info_reason,</if>
+            <if test="examineInfoPeople != null">examine_info_people,</if>
+            <if test="examineInfoResult != null">examine_info_result,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="userId != null">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="examineInfoDateBegin != null">#{examineInfoDateBegin},</if>
+            <if test="examineInfoDateEnd != null">#{examineInfoDateEnd},</if>
+            <if test="examineInfoId != null">#{examineInfoId},</if>
+            <if test="leaveType != null">#{leaveType},</if>
+            <if test="examineInfoName != null">#{examineInfoName},</if>
+            <if test="examineInfoDept != null">#{examineInfoDept},</if>
+            <if test="examineInfoReason != null">#{examineInfoReason},</if>
+            <if test="examineInfoPeople != null">#{examineInfoPeople},</if>
+            <if test="examineInfoResult != null">#{examineInfoResult},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="userId != null">#{userId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateexamine" parameterType="examine">
+        update examine_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="examineInfoDateBegin != null">examine_info_date_begin = #{examineInfoDateBegin},</if>
+            <if test="examineInfoDateEnd != null">examine_info_date_end = #{examineInfoDateEnd},</if>
+            <if test="examineInfoId != null">examine_info_id = #{examineInfoId},</if>
+            <if test="leaveType != null">leave_type = #{leaveType},</if>
+            <if test="examineInfoName != null">examine_info_name = #{examineInfoName},</if>
+            <if test="examineInfoDept != null">examine_info_dept = #{examineInfoDept},</if>
+            <if test="examineInfoReason != null">examine_info_reason = #{examineInfoReason},</if>
+            <if test="examineInfoPeople != null">examine_info_people = #{examineInfoPeople},</if>
+            <if test="examineInfoResult != null">examine_info_result = #{examineInfoResult},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="firstApprovalTime != null">first_approval_time = #{firstApprovalTime},</if>
+            <if test="approvalTime != null">approval_time = #{approvalTime},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteexamineById" parameterType="String">
+        delete from examine_info where id = #{id}
+    </delete>
+
+    <delete id="deleteexamineByIds" parameterType="String">
+        delete from examine_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteexamineByEmpId" parameterType="String">
+        delete from examine_info where examine_info_id = #{examineInfoId}
+    </delete>
+
+    <select id="countLeaveDays" resultType="int">
+        SELECT COALESCE(SUM(DATEDIFF(examine_info_date_end, examine_info_date_begin) + 1), 0) as days
+        FROM examine_info
+        WHERE examine_info_id = #{empId} 
+          AND examine_info_result = 2
+          AND (
+            (examine_info_date_begin BETWEEN #{startDate} AND #{endDate})
+            OR (examine_info_date_end BETWEEN #{startDate} AND #{endDate})
+            OR (examine_info_date_begin &lt;= #{startDate} AND examine_info_date_end >= #{endDate})
+          )
+    </select>
+    
+    <!-- 根据部门ID列表查询请假记录 -->
+    <select id="selectexamineByDeptIds" resultMap="examineResult">
+        SELECT
+            e.id,
+            e.examine_info_date_begin,
+            e.examine_info_date_end,
+            e.examine_info_id,
+            e.leave_type,
+            e.examine_info_name,
+            e.examine_info_dept,
+            e.examine_info_reason,
+            e.examine_info_people,
+            e.examine_info_result,
+            e.create_time,
+            e.first_approval_time,
+            e.approval_time,
+            e.user_id,
+            e.remark
+        FROM
+            examine_info e
+        LEFT JOIN emp_info ei ON e.examine_info_id = ei.emp_info_id
+        <where>
+            <!-- 基本查询条件 -->
+            <if test="examine.id != null and examine.id != ''"> and e.id = #{examine.id}</if>
+            <if test="examine.examineInfoDateBegin != null"> and e.examine_info_date_begin = #{examine.examineInfoDateBegin}</if>
+            <if test="examine.examineInfoDateEnd != null"> and e.examine_info_date_end = #{examine.examineInfoDateEnd}</if>
+            <if test="examine.examineInfoId != null and examine.examineInfoId != ''"> and e.examine_info_id = #{examine.examineInfoId}</if>
+            <if test="examine.leaveType != null and examine.leaveType != ''"> and e.leave_type = #{examine.leaveType}</if>
+            <if test="examine.examineInfoName != null and examine.examineInfoName != ''"> and e.examine_info_name like concat('%', #{examine.examineInfoName}, '%')</if>
+            <if test="examine.examineInfoDept != null and examine.examineInfoDept != ''"> and e.examine_info_dept like concat('%', #{examine.examineInfoDept}, '%')</if>
+            <if test="examine.examineInfoReason != null and examine.examineInfoReason != ''"> and e.examine_info_reason like concat('%', #{examine.examineInfoReason}, '%')</if>
+            <if test="examine.examineInfoPeople != null and examine.examineInfoPeople != ''"> and e.examine_info_people = #{examine.examineInfoPeople}</if>
+            <if test="examine.examineInfoResult != null"> and e.examine_info_result = #{examine.examineInfoResult}</if>
+            <if test="examine.userId != null"> and e.user_id = #{examine.userId}</if>
+            
+            <!-- 部门筛选条件 -->
+            <if test="deptIds != null and deptIds.size() > 0">
+                and ei.dept_id in
+                <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY e.create_time DESC
+    </select>
+</mapper>

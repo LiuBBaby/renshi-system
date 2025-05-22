@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.interview.mapper.InterviewInfoMapper">
+
+    <resultMap type="InterviewInfo" id="InterviewInfoResult">
+        <result property="id" column="id"/>
+        <result property="interviewInfoName" column="interview_info_name"/>
+        <result property="interviewInfoPhone" column="interview_info_phone"/>
+        <result property="interviewInfoTime" column="interview_info_time"/>
+        <result property="interviewInfoPeople" column="interview_info_people"/>
+        <result property="interviewInfoNumber" column="interview_info_number"/>
+        <result property="interviewInfoStatus" column="interview_info_status"/>
+        <result property="creatTime" column="creat_time"/>
+    </resultMap>
+
+    <!-- 查询 emp_info_name -->
+    <select id="selectEmpInfoNameByEmpInfoId" parameterType="String" resultType="String">
+        SELECT emp_info_name
+        FROM emp_info
+        WHERE emp_info_id = #{empInfoId}
+    </select>
+
+    <!-- 新增操作 -->
+    <insert id="insertInterviewInfo" parameterType="InterviewInfo" useGeneratedKeys="true" keyProperty="id">
+        <!-- 查询 emp_info_name 并赋值给 interviewInfoPeople -->
+        <selectKey keyProperty="interviewInfoPeople" resultType="String" order="BEFORE">
+            SELECT emp_info_name
+            FROM emp_info
+            WHERE emp_info_id = #{interviewInfoNumber}
+        </selectKey>
+
+        INSERT INTO interview_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="interviewInfoName != null">interview_info_name,</if>
+            <if test="interviewInfoPhone != null">interview_info_phone,</if>
+            <if test="interviewInfoTime != null">interview_info_time,</if>
+            <if test="interviewInfoPeople != null">interview_info_people,</if>
+            <if test="interviewInfoNumber != null">interview_info_number,</if>
+            <if test="interviewInfoStatus != null">interview_info_status,</if>
+            <if test="creatTime != null">creat_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="interviewInfoName != null">#{interviewInfoName},</if>
+            <if test="interviewInfoPhone != null">#{interviewInfoPhone},</if>
+            <if test="interviewInfoTime != null">#{interviewInfoTime},</if>
+            <if test="interviewInfoPeople != null">#{interviewInfoPeople},</if>
+            <if test="interviewInfoNumber != null">#{interviewInfoNumber},</if>
+            <if test="interviewInfoStatus != null">#{interviewInfoStatus},</if>
+            <if test="creatTime != null">#{creatTime},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改操作 -->
+    <update id="updateInterviewInfo" parameterType="InterviewInfo">
+        <!-- 查询 emp_info_name 并赋值给 interviewInfoPeople -->
+        <selectKey keyProperty="interviewInfoPeople" resultType="String" order="BEFORE">
+            SELECT emp_info_name
+            FROM emp_info
+            WHERE emp_info_id = #{interviewInfoNumber}
+        </selectKey>
+
+        UPDATE interview_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="interviewInfoName != null">interview_info_name = #{interviewInfoName},</if>
+            <if test="interviewInfoPhone != null">interview_info_phone = #{interviewInfoPhone},</if>
+            <if test="interviewInfoTime != null">interview_info_time = #{interviewInfoTime},</if>
+            <if test="interviewInfoPeople != null">interview_info_people = #{interviewInfoPeople},</if>
+            <if test="interviewInfoNumber != null">interview_info_number = #{interviewInfoNumber},</if>
+            <if test="interviewInfoStatus != null">interview_info_status = #{interviewInfoStatus},</if>
+            <if test="creatTime != null">creat_time = #{creatTime},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询所有 -->
+    <sql id="selectInterviewInfoVo">
+        SELECT id, interview_info_name, interview_info_phone, interview_info_time, interview_info_people,
+        interview_info_number, interview_info_status, creat_time
+        FROM interview_info
+    </sql>
+
+    <select id="selectInterviewInfoList" parameterType="InterviewInfo" resultMap="InterviewInfoResult">
+        <include refid="selectInterviewInfoVo"/>
+        <where>
+            <if test="interviewInfoName != null and interviewInfoName != ''"> AND interview_info_name LIKE CONCAT('%', #{interviewInfoName}, '%')</if>
+            <if test="interviewInfoPhone != null"> AND interview_info_phone = #{interviewInfoPhone}</if>
+            <if test="interviewInfoTime != null"> AND interview_info_time = #{interviewInfoTime}</if>
+            <if test="interviewInfoPeople != null and interviewInfoPeople != ''"> AND interview_info_people LIKE CONCAT('%', #{interviewInfoPeople}, '%')</if>
+            <if test="interviewInfoStatus != null and interviewInfoStatus != ''"> AND interview_info_status = #{interviewInfoStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectInterviewInfoById" parameterType="String" resultMap="InterviewInfoResult">
+        <include refid="selectInterviewInfoVo"/>
+        WHERE id = #{id}
+    </select>
+
+    <!-- 删除单条记录 -->
+    <delete id="deleteInterviewInfoById" parameterType="String">
+        DELETE FROM interview_info WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteInterviewInfoByIds" parameterType="String">
+        DELETE FROM interview_info WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteInterviewInfoByEmpId" parameterType="String">
+        delete from interview_info where interview_info_number = #{interviewInfoNumber}
+    </delete>
+</mapper>

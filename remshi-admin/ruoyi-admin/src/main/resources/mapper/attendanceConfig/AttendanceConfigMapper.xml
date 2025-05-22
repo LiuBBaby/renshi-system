@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.attendanceConfig.mapper.AttendanceConfigMapper">
+    
+    <resultMap type="AttendanceConfig" id="AttendanceConfigResult">
+        <result property="id"    column="id"    />
+        <result property="paramKey"    column="param_key"    />
+        <result property="paramValue"    column="param_value"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectAttendanceConfigVo">
+        select id, param_key, param_value, status, remark from attendance_config
+    </sql>
+
+    <select id="selectAttendanceConfigList" parameterType="AttendanceConfig" resultMap="AttendanceConfigResult">
+        <include refid="selectAttendanceConfigVo"/>
+        <where>  
+            <if test="remark != null  and remark != ''"> and remark = #{remark}</if>
+        </where>
+    </select>
+    
+    <select id="selectAttendanceConfigById" parameterType="String" resultMap="AttendanceConfigResult">
+        <include refid="selectAttendanceConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertAttendanceConfig" parameterType="AttendanceConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into attendance_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="paramKey != null and paramKey != ''">param_key,</if>
+            <if test="paramValue != null and paramValue != ''">param_value,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="paramKey != null and paramKey != ''">#{paramKey},</if>
+            <if test="paramValue != null and paramValue != ''">#{paramValue},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAttendanceConfig" parameterType="AttendanceConfig">
+        update attendance_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="paramKey != null and paramKey != ''">param_key = #{paramKey},</if>
+            <if test="paramValue != null and paramValue != ''">param_value = #{paramValue},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteAttendanceConfigById" parameterType="String">
+        delete from attendance_config where id = #{id}
+    </delete>
+
+    <delete id="deleteAttendanceConfigByIds" parameterType="String">
+        delete from attendance_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

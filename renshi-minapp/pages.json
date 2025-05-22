@@ -1,0 +1,128 @@
+{
+  
+  "pages": [{
+    "path": "pages/login",
+    "style": {
+      "navigationBarTitleText": "登录"
+    }
+  }, {
+    "path": "pages/register",
+    "style": {
+      "navigationBarTitleText": "注册"
+    }
+  }, {
+    "path": "pages/index",
+    "style": {
+      "navigationBarTitleText": "人事管理系统",
+      "navigationStyle": "custom"
+    }
+  }, {
+    "path": "pages/checkin/index",
+    "style": {
+      "navigationBarTitleText": "考勤打卡"
+    }
+  }, {
+    "path": "pages/apply/index",
+    "style": {
+      "navigationBarTitleText": "申请"
+    }
+  }, {
+    "path": "pages/attendance/index",
+    "style": {
+      "navigationBarTitleText": "考勤"
+    }
+  }, {
+    "path": "pages/attendance/monthly",
+    "style": {
+      "navigationBarTitleText": "月度考勤"
+    }
+  }, {
+    "path": "pages/attendance/evaluate",
+    "style": {
+      "navigationBarTitleText": "考勤评价"
+    }
+  }, {
+    "path": "pages/apply/leave/add",
+    "style": {
+      "navigationBarTitleText": "新建请假"
+    }
+  }, {
+    "path": "pages/apply/business/add",
+    "style": {
+      "navigationBarTitleText": "新建出差"
+    }
+  }, {
+    "path": "pages/apply/leave/detail",
+    "style": {
+      "navigationBarTitleText": "请假详情"
+    }
+  }, {
+    "path": "pages/apply/business/detail",
+    "style": {
+      "navigationBarTitleText": "出差详情"
+    }
+  }, {
+    "path": "pages/mine/index",
+    "style": {
+      "navigationBarTitleText": "我的"
+    }
+  }, {
+    "path": "pages/mine/avatar/index",
+    "style": {
+      "navigationBarTitleText": "修改头像"
+    }
+  }, {
+    "path": "pages/mine/info/index",
+    "style": {
+      "navigationBarTitleText": "个人信息"
+    }
+  }, {
+    "path": "pages/mine/info/edit",
+    "style": {
+      "navigationBarTitleText": "编辑资料"
+    }
+  }, {
+    "path": "pages/mine/pwd/index",
+    "style": {
+      "navigationBarTitleText": "修改密码"
+    }
+  },{
+    "path": "pages/error/404",
+    "style": {
+      "navigationBarTitleText": "页面不存在"
+    }
+  }],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4a90e2",
+    "borderStyle": "white",
+    "backgroundColor": "#ffffff",
+    "list": [{
+        "pagePath": "pages/checkin/index",
+        "iconPath": "static/images/tabbar/checkin.png",
+        "selectedIconPath": "static/images/tabbar/checkin_selected.png",
+        "text": "考勤打卡"
+      }, {
+        "pagePath": "pages/apply/index",
+        "iconPath": "static/images/tabbar/apply.png",
+        "selectedIconPath": "static/images/tabbar/apply_selected.png",
+        "text": "申请"
+      }, {
+        "pagePath": "pages/attendance/index",
+        "iconPath": "static/images/tabbar/approval.png",
+        "selectedIconPath": "static/images/tabbar/approval_selected.png",
+        "text": "考勤"
+      }, {
+        "pagePath": "pages/mine/index",
+        "iconPath": "static/images/tabbar/mine.png",
+        "selectedIconPath": "static/images/tabbar/mine_.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "人事管理系统",
+    "navigationBarBackgroundColor": "#FFFFFF"
+  }
+}

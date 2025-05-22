@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EmpInfoMapper">
+
+    <resultMap type="EmpInfo" id="EmpInfoResult">
+        <result property="empInfoId"    column="emp_info_id"    />
+        <result property="empInfoName"    column="emp_info_name"    />
+        <result property="empInfoSex"    column="emp_info_sex"    />
+        <result property="empInfoAge"    column="emp_info_age"    />
+        <result property="empInfoIphone"    column="emp_info_iphone"    />
+        <result property="empInfoEducational"    column="emp_info_educational"    />
+        <result property="empInfoEntry"    column="emp_info_entry"    />
+        <result property="status"    column="emp_info.status"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="emp_info.create_time"    />
+        <result property="username"    column="username"    />
+        <result property="passsword"    column="passsword"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+
+    <sql id="selectEmpInfoVo">
+        select emp_info.emp_info_id, emp_info.emp_info_name, emp_info.emp_info_sex, emp_info.emp_info_age, emp_info.emp_info_iphone, emp_info.emp_info_educational, emp_info.emp_info_entry, emp_info.status as "emp_info.status", emp_info.dept_id, emp_info.create_time, username, passsword, dept_name, emp_info.user_id
+        from emp_info
+        left join sys_dept on emp_info.dept_id = sys_dept.dept_id
+    </sql>
+
+    <select id="selectEmpInfoList" parameterType="EmpInfo" resultMap="EmpInfoResult">
+        <include refid="selectEmpInfoVo"/>
+        <where>
+            <if test="empInfoId != null  and empInfoId != ''"> and emp_info.emp_info_id = #{empInfoId}</if>
+            <if test="empInfoName != null  and empInfoName != ''"> and emp_info.emp_info_name like concat('%', #{empInfoName}, '%')</if>
+            <if test="empInfoSex != null "> and emp_info.emp_info_sex = #{empInfoSex}</if>
+            <if test="empInfoIphone != null  and empInfoIphone != ''"> and emp_info.emp_info_iphone like concat('%', #{empInfoIphone}, '%')</if>
+            <if test="empInfoEducational != null  and empInfoEducational != ''"> and emp_info.emp_info_educational = #{empInfoEducational}</if>
+            <if test="params.beginEmpInfoEntry != null and params.beginEmpInfoEntry != '' and params.endEmpInfoEntry != null and params.endEmpInfoEntry != ''"> and emp_info.emp_info_entry between #{params.beginEmpInfoEntry} and #{params.endEmpInfoEntry}</if>
+            <if test="status != null "> and emp_info.status = #{status}</if>
+            <if test="deptId != null "> and emp_info.dept_id = #{deptId}</if>
+            <!-- 数据权限过滤条件 -->
+            ${params.dataScope}
+        </where>
+    </select>
+
+    <select id="selectEmpInfoByEmpInfoId" parameterType="String" resultMap="EmpInfoResult">
+        <include refid="selectEmpInfoVo"/>
+        where emp_info.emp_info_id = #{empInfoId}
+    </select>
+
+    <insert id="insertEmpInfo" parameterType="EmpInfo">
+        insert into emp_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empInfoId != null and empInfoId != ''">emp_info_id,</if>
+            <if test="empInfoName != null">emp_info_name,</if>
+            <if test="empInfoSex != null">emp_info_sex,</if>
+            <if test="empInfoAge != null">emp_info_age,</if>
+            <if test="empInfoIphone != null">emp_info_iphone,</if>
+            <if test="empInfoEducational != null">emp_info_educational,</if>
+            <if test="empInfoEntry != null">emp_info_entry,</if>
+            <if test="status != null">status,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="username != null">username,</if>
+            <if test="passsword != null">passsword,</if>
+            <if test="userId != null">user_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empInfoId != null and empInfoId != ''">#{empInfoId},</if>
+            <if test="empInfoName != null">#{empInfoName},</if>
+            <if test="empInfoSex != null">#{empInfoSex},</if>
+            <if test="empInfoAge != null">#{empInfoAge},</if>
+            <if test="empInfoIphone != null">#{empInfoIphone},</if>
+            <if test="empInfoEducational != null">#{empInfoEducational},</if>
+            <if test="empInfoEntry != null">#{empInfoEntry},</if>
+            <if test="status != null">#{status},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="username != null">#{username},</if>
+            <if test="passsword != null">#{passsword},</if>
+            <if test="userId != null">#{userId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateEmpInfo" parameterType="EmpInfo">
+        update emp_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empInfoName != null">emp_info_name = #{empInfoName},</if>
+            <if test="empInfoSex != null">emp_info_sex = #{empInfoSex},</if>
+            <if test="empInfoAge != null">emp_info_age = #{empInfoAge},</if>
+            <if test="empInfoIphone != null">emp_info_iphone = #{empInfoIphone},</if>
+            <if test="empInfoEducational != null">emp_info_educational = #{empInfoEducational},</if>
+            <if test="empInfoEntry != null">emp_info_entry = #{empInfoEntry},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="passsword != null">passsword = #{passsword},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+        </trim>
+        where emp_info_id = #{empInfoId}
+    </update>
+
+    <delete id="deleteEmpInfoByEmpInfoId" parameterType="String">
+        delete from emp_info where emp_info_id = #{empInfoId}
+    </delete>
+
+    <delete id="deleteEmpInfoByEmpInfoIds" parameterType="String">
+        delete from emp_info where emp_info_id in
+        <foreach item="empInfoId" collection="array" open="(" separator="," close=")">
+            #{empInfoId}
+        </foreach>
+    </delete>
+
+    <select id="selectEmpInfoByUserId" parameterType="EmpInfo" resultMap="EmpInfoResult">
+        <include refid="selectEmpInfoVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <!-- 通过部门ID数组查询员工列表 -->
+    <select id="selectEmpInfoByDeptIds" resultMap="EmpInfoResult">
+        <include refid="selectEmpInfoVo"/>
+        where emp_info.dept_id in
+        <foreach collection="list" item="deptId" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </select>
+</mapper>
+
+
+

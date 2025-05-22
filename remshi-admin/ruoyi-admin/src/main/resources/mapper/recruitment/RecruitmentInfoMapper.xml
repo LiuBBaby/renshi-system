@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.recruitment.mapper.RecruitmentInfoMapper">
+
+    <resultMap type="RecruitmentInfo" id="RecruitmentInfoResult">
+        <result property="id" column="id"/>
+        <result property="recruitmentInfoNumber" column="recruitment_info_number"/>
+        <result property="recruitmentInfoPost" column="recruitment_info_post"/>
+        <result property="recruitmentInfoDegree" column="recruitment_info_degree"/>
+        <result property="recruitmentInfoDuration" column="recruitment_info_duration"/>
+        <result property="recruitmentInfoDemand" column="recruitment_info_demand"/>
+        <result property="recruitmentInfoId" column="recruitment_info_id"/>
+        <result property="recruitmentInfoResponsible" column="recruitment_info_responsible"/>
+        <result property="recruitmentInfoStatus" column="recruitment_info_status"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!-- 查询 emp_info_name -->
+    <select id="selectEmpInfoNameByEmpInfoId" parameterType="String" resultType="String">
+        SELECT emp_info_name
+        FROM emp_info
+        WHERE emp_info_id = #{empInfoId}
+    </select>
+
+    <!-- 新增操作 -->
+    <insert id="insertRecruitmentInfo" parameterType="RecruitmentInfo" useGeneratedKeys="true" keyProperty="id">
+        <!-- 查询 emp_info_name 并赋值给 recruitmentInfoResponsible -->
+        <selectKey keyProperty="recruitmentInfoResponsible" resultType="String" order="BEFORE">
+            SELECT emp_info_name
+            FROM emp_info
+            WHERE emp_info_id = #{recruitmentInfoId} LIMIT 1
+        </selectKey>
+
+        INSERT INTO recruitment_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recruitmentInfoNumber != null">recruitment_info_number,</if>
+            <if test="recruitmentInfoPost != null">recruitment_info_post,</if>
+            <if test="recruitmentInfoDegree != null">recruitment_info_degree,</if>
+            <if test="recruitmentInfoDuration != null">recruitment_info_duration,</if>
+            <if test="recruitmentInfoDemand != null">recruitment_info_demand,</if>
+            <if test="recruitmentInfoId != null">recruitment_info_id,</if>
+            <if test="recruitmentInfoResponsible != null">recruitment_info_responsible,</if>
+            <if test="recruitmentInfoStatus != null">recruitment_info_status,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="recruitmentInfoNumber != null">#{recruitmentInfoNumber},</if>
+            <if test="recruitmentInfoPost != null">#{recruitmentInfoPost},</if>
+            <if test="recruitmentInfoDegree != null">#{recruitmentInfoDegree},</if>
+            <if test="recruitmentInfoDuration != null">#{recruitmentInfoDuration},</if>
+            <if test="recruitmentInfoDemand != null">#{recruitmentInfoDemand},</if>
+            <if test="recruitmentInfoId != null">#{recruitmentInfoId},</if>
+            <if test="recruitmentInfoResponsible != null">#{recruitmentInfoResponsible},</if>
+            <if test="recruitmentInfoStatus != null">#{recruitmentInfoStatus},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改操作 -->
+    <update id="updateRecruitmentInfo" parameterType="RecruitmentInfo">
+        <!-- 查询 emp_info_name 并赋值给 recruitmentInfoResponsible -->
+        <selectKey keyProperty="recruitmentInfoResponsible" resultType="String" order="BEFORE">
+            SELECT emp_info_name
+            FROM emp_info
+            WHERE emp_info_id = #{recruitmentInfoId} LIMIT 1
+        </selectKey>
+
+        UPDATE recruitment_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="recruitmentInfoNumber != null">recruitment_info_number = #{recruitmentInfoNumber},</if>
+            <if test="recruitmentInfoPost != null">recruitment_info_post = #{recruitmentInfoPost},</if>
+            <if test="recruitmentInfoDegree != null">recruitment_info_degree = #{recruitmentInfoDegree},</if>
+            <if test="recruitmentInfoDuration != null">recruitment_info_duration = #{recruitmentInfoDuration},</if>
+            <if test="recruitmentInfoDemand != null">recruitment_info_demand = #{recruitmentInfoDemand},</if>
+            <if test="recruitmentInfoId != null">recruitment_info_id = #{recruitmentInfoId},</if>
+            <if test="recruitmentInfoResponsible != null">recruitment_info_responsible = #{recruitmentInfoResponsible},</if>
+            <if test="recruitmentInfoStatus != null">recruitment_info_status = #{recruitmentInfoStatus},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询所有 -->
+    <sql id="selectRecruitmentInfoVo">
+        SELECT id, recruitment_info_number, recruitment_info_post, recruitment_info_degree, recruitment_info_duration,
+        recruitment_info_demand, recruitment_info_id, recruitment_info_responsible, recruitment_info_status, create_time
+        FROM recruitment_info
+    </sql>
+
+    <select id="selectRecruitmentInfoList" parameterType="RecruitmentInfo" resultMap="RecruitmentInfoResult">
+        <include refid="selectRecruitmentInfoVo"/>
+        <where>
+            <if test="recruitmentInfoPost != null and recruitmentInfoPost != ''"> AND recruitment_info_post LIKE CONCAT('%', #{recruitmentInfoPost}, '%')</if>
+            <if test="recruitmentInfoDegree != null"> AND recruitment_info_degree = #{recruitmentInfoDegree}</if>
+            <if test="recruitmentInfoId != null and recruitmentInfoId != ''"> AND recruitment_info_id = #{recruitmentInfoId}</if>
+            <if test="recruitmentInfoResponsible != null and recruitmentInfoResponsible != ''"> AND recruitment_info_responsible LIKE CONCAT('%', #{recruitmentInfoResponsible}, '%')</if>
+            <if test="recruitmentInfoStatus != null"> AND recruitment_info_status = #{recruitmentInfoStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectRecruitmentInfoById" parameterType="String" resultMap="RecruitmentInfoResult">
+        <include refid="selectRecruitmentInfoVo"/>
+        WHERE id = #{id}
+    </select>
+
+    <!-- 删除单条记录 -->
+    <delete id="deleteRecruitmentInfoById" parameterType="String">
+        DELETE FROM recruitment_info WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteRecruitmentInfoByIds" parameterType="String">
+        DELETE FROM recruitment_info WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRecruitmentInfoByEmpId" parameterType="String">
+        DELETE FROM recruitment_info WHERE recruitment_info_id = #{recruitmentInfoId}
+    </delete>
+</mapper>

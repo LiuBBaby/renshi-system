@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.salary.mapper.SalaryMonthlyMapper">
+    
+    <resultMap type="SalaryMonthly" id="SalaryMonthlyResult">
+        <result property="id"    column="id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="year"    column="year"    />
+        <result property="month"    column="month"    />
+        <result property="baseSalary"    column="base_salary"    />
+        <result property="actualAttendanceDays"    column="actual_attendance_days"    />
+        <result property="absenceDays"    column="absence_days"    />
+        <result property="lateEarlyCount"    column="late_early_count"    />
+        <result property="overtimeHours"    column="overtime_hours"    />
+        <result property="businessTripDays"    column="business_trip_days"    />
+        <result property="leaveDays"    column="leave_days"    />
+        <result property="attendanceSalary"    column="attendance_salary"    />
+        <result property="deductionAmount"    column="deduction_amount"    />
+        <result property="leaveDeduction"    column="leave_deduction"    />
+        <result property="overtimePay"    column="overtime_pay"    />
+        <result property="businessTripAllowance"    column="business_trip_allowance"    />
+        <result property="performancePay"    column="performance_pay"    />
+        <result property="totalSalary"    column="total_salary"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="empName"    column="emp_name"    />
+        <result property="deptName"    column="dept_name"    />
+    </resultMap>
+
+    <sql id="selectSalaryMonthlyVo">
+        select sm.id, sm.emp_id, sm.year, sm.month, sm.base_salary, sm.actual_attendance_days, sm.absence_days, sm.late_early_count, sm.overtime_hours, sm.business_trip_days, sm.leave_days, sm.attendance_salary, sm.deduction_amount, sm.leave_deduction, sm.overtime_pay, sm.business_trip_allowance, sm.performance_pay, sm.total_salary, sm.status, sm.create_time, sm.update_time, sm.remark from salary_monthly sm
+    </sql>
+    
+    <sql id="selectSalaryMonthlyWithEmpVo">
+        select sm.id, sm.emp_id, sm.year, sm.month, sm.base_salary, sm.actual_attendance_days, sm.absence_days, 
+        sm.late_early_count, sm.overtime_hours, sm.business_trip_days, sm.leave_days, sm.attendance_salary, 
+        sm.deduction_amount, sm.leave_deduction, sm.overtime_pay, sm.business_trip_allowance, sm.performance_pay, 
+        sm.total_salary, sm.status, sm.create_time, sm.update_time, sm.remark,
+        ei.emp_info_name as emp_name, d.dept_name
+        from salary_monthly sm
+        left join emp_info ei on sm.emp_id = ei.emp_info_id
+        left join sys_dept d on ei.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectSalaryMonthlyList" parameterType="SalaryMonthly" resultMap="SalaryMonthlyResult">
+        <include refid="selectSalaryMonthlyWithEmpVo"/>
+        <where>
+            <if test="empId != null  and empId != ''"> and sm.emp_id = #{empId}</if>
+            <if test="year != null "> and sm.year = #{year}</if>
+            <if test="month != null "> and sm.month = #{month}</if>
+            <if test="status != null  and status != ''"> and sm.status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectSalaryMonthlyById" parameterType="Integer" resultMap="SalaryMonthlyResult">
+        <include refid="selectSalaryMonthlyWithEmpVo"/>
+        where sm.id = #{id}
+    </select>
+        
+    <insert id="insertSalaryMonthly" parameterType="SalaryMonthly" useGeneratedKeys="true" keyProperty="id">
+        insert into salary_monthly
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id,</if>
+            <if test="year != null">year,</if>
+            <if test="month != null">month,</if>
+            <if test="baseSalary != null">base_salary,</if>
+            <if test="actualAttendanceDays != null">actual_attendance_days,</if>
+            <if test="absenceDays != null">absence_days,</if>
+            <if test="lateEarlyCount != null">late_early_count,</if>
+            <if test="overtimeHours != null">overtime_hours,</if>
+            <if test="businessTripDays != null">business_trip_days,</if>
+            <if test="leaveDays != null">leave_days,</if>
+            <if test="attendanceSalary != null">attendance_salary,</if>
+            <if test="deductionAmount != null">deduction_amount,</if>
+            <if test="leaveDeduction != null">leave_deduction,</if>
+            <if test="overtimePay != null">overtime_pay,</if>
+            <if test="businessTripAllowance != null">business_trip_allowance,</if>
+            <if test="performancePay != null">performance_pay,</if>
+            <if test="totalSalary != null">total_salary,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">#{empId},</if>
+            <if test="year != null">#{year},</if>
+            <if test="month != null">#{month},</if>
+            <if test="baseSalary != null">#{baseSalary},</if>
+            <if test="actualAttendanceDays != null">#{actualAttendanceDays},</if>
+            <if test="absenceDays != null">#{absenceDays},</if>
+            <if test="lateEarlyCount != null">#{lateEarlyCount},</if>
+            <if test="overtimeHours != null">#{overtimeHours},</if>
+            <if test="businessTripDays != null">#{businessTripDays},</if>
+            <if test="leaveDays != null">#{leaveDays},</if>
+            <if test="attendanceSalary != null">#{attendanceSalary},</if>
+            <if test="deductionAmount != null">#{deductionAmount},</if>
+            <if test="leaveDeduction != null">#{leaveDeduction},</if>
+            <if test="overtimePay != null">#{overtimePay},</if>
+            <if test="businessTripAllowance != null">#{businessTripAllowance},</if>
+            <if test="performancePay != null">#{performancePay},</if>
+            <if test="totalSalary != null">#{totalSalary},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSalaryMonthly" parameterType="SalaryMonthly">
+        update salary_monthly
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id = #{empId},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="month != null">month = #{month},</if>
+            <if test="baseSalary != null">base_salary = #{baseSalary},</if>
+            <if test="actualAttendanceDays != null">actual_attendance_days = #{actualAttendanceDays},</if>
+            <if test="absenceDays != null">absence_days = #{absenceDays},</if>
+            <if test="lateEarlyCount != null">late_early_count = #{lateEarlyCount},</if>
+            <if test="overtimeHours != null">overtime_hours = #{overtimeHours},</if>
+            <if test="businessTripDays != null">business_trip_days = #{businessTripDays},</if>
+            <if test="leaveDays != null">leave_days = #{leaveDays},</if>
+            <if test="attendanceSalary != null">attendance_salary = #{attendanceSalary},</if>
+            <if test="deductionAmount != null">deduction_amount = #{deductionAmount},</if>
+            <if test="leaveDeduction != null">leave_deduction = #{leaveDeduction},</if>
+            <if test="overtimePay != null">overtime_pay = #{overtimePay},</if>
+            <if test="businessTripAllowance != null">business_trip_allowance = #{businessTripAllowance},</if>
+            <if test="performancePay != null">performance_pay = #{performancePay},</if>
+            <if test="totalSalary != null">total_salary = #{totalSalary},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSalaryMonthlyById" parameterType="Integer">
+        delete from salary_monthly where id = #{id}
+    </delete>
+
+    <delete id="deleteSalaryMonthlyByIds" parameterType="String">
+        delete from salary_monthly where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper> 

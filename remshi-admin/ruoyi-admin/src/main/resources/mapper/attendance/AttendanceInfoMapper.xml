@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.attendance.mapper.AttendanceInfoMapper">
+
+    <resultMap type="AttendanceInfo" id="AttendanceInfoResult">
+        <result property="attendanceInfoId"    column="attendance_info_id"    />
+        <result property="attendanceInfoName"    column="attendance_info_name"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="checkInTime"    column="check_in_time"    />
+        <result property="checkOutTime"    column="check_out_time"    />
+        <result property="checkInStatus"    column="check_in_status"    />
+        <result property="checkOutStatus"    column="check_out_status"    />
+        <result property="attendanceInfoDate"    column="attendance_info_date"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="evaluate"    column="evaluate"    />
+        <result property="goLongitude"    column="go_longitude"    />
+        <result property="goLatitude"    column="go_latitude"    />
+        <result property="goAddress"    column="go_address"    />
+        <result property="outLongitude"    column="out_longitude"    />
+        <result property="outLatitude"    column="out_latitude"    />
+        <result property="outAddress"    column="out_address"    />
+    </resultMap>
+
+    <sql id="selectAttendanceInfoVo">
+        select attendance_info_id, attendance_info_name, emp_id, check_in_time, check_out_time, 
+        check_in_status, check_out_status, attendance_info_date, create_time, evaluate, 
+        go_longitude, go_latitude, go_address, out_longitude, out_latitude, out_address 
+        from attendance_info
+    </sql>
+
+    <select id="selectAttendanceInfoList" parameterType="AttendanceInfo" resultMap="AttendanceInfoResult">
+        <include refid="selectAttendanceInfoVo"/>
+        <where>
+            <if test="attendanceInfoName != null  and attendanceInfoName != ''"> and attendance_info_name like concat('%', #{attendanceInfoName}, '%')</if>
+            <if test="empId != null  and empId != ''"> and emp_id = #{empId}</if>
+            <if test="checkInStatus != null "> and check_in_status = #{checkInStatus}</if>
+            <if test="checkOutStatus != null "> and check_out_status = #{checkOutStatus}</if>
+            <if test="attendanceInfoDate != null"> 
+                and DATE(attendance_info_date) = DATE(#{attendanceInfoDate})
+            </if>
+            <if test="params.beginAttendanceInfoDate != null and params.beginAttendanceInfoDate != '' and params.endAttendanceInfoDate != null and params.endAttendanceInfoDate != ''"> and attendance_info_date between #{params.beginAttendanceInfoDate} and #{params.endAttendanceInfoDate}</if>
+            <if test="evaluate != null "> and evaluate = #{evaluate}</if>
+        </where>
+    </select>
+
+    <select id="selectAttendanceInfoByAttendanceInfoId" parameterType="String" resultMap="AttendanceInfoResult">
+        <include refid="selectAttendanceInfoVo"/>
+        where attendance_info_id = #{attendanceInfoId}
+    </select>
+
+    <insert id="insertAttendanceInfo" parameterType="AttendanceInfo" useGeneratedKeys="true" keyProperty="attendanceInfoId">
+        insert into attendance_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="attendanceInfoName != null">attendance_info_name,</if>
+            <if test="empId != null">emp_id,</if>
+            <if test="checkInTime != null">check_in_time,</if>
+            <if test="checkOutTime != null">check_out_time,</if>
+            <if test="checkInStatus != null">check_in_status,</if>
+            <if test="checkOutStatus != null">check_out_status,</if>
+            <if test="attendanceInfoDate != null">attendance_info_date,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="evaluate != null">evaluate,</if>
+            <if test="goLongitude != null">go_longitude,</if>
+            <if test="goLatitude != null">go_latitude,</if>
+            <if test="goAddress != null">go_address,</if>
+            <if test="outLongitude != null">out_longitude,</if>
+            <if test="outLatitude != null">out_latitude,</if>
+            <if test="outAddress != null">out_address,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="attendanceInfoName != null">#{attendanceInfoName},</if>
+            <if test="empId != null">#{empId},</if>
+            <if test="checkInTime != null">#{checkInTime},</if>
+            <if test="checkOutTime != null">#{checkOutTime},</if>
+            <if test="checkInStatus != null">#{checkInStatus},</if>
+            <if test="checkOutStatus != null">#{checkOutStatus},</if>
+            <if test="attendanceInfoDate != null">#{attendanceInfoDate},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="evaluate != null">#{evaluate},</if>
+            <if test="goLongitude != null">#{goLongitude},</if>
+            <if test="goLatitude != null">#{goLatitude},</if>
+            <if test="goAddress != null">#{goAddress},</if>
+            <if test="outLongitude != null">#{outLongitude},</if>
+            <if test="outLatitude != null">#{outLatitude},</if>
+            <if test="outAddress != null">#{outAddress},</if>
+        </trim>
+    </insert>
+
+    <update id="updateAttendanceInfo" parameterType="AttendanceInfo">
+        update attendance_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attendanceInfoName != null">attendance_info_name = #{attendanceInfoName},</if>
+            <if test="empId != null">emp_id = #{empId},</if>
+            <if test="checkInTime != null">check_in_time = #{checkInTime},</if>
+            <if test="checkOutTime != null">check_out_time = #{checkOutTime},</if>
+            <if test="checkInStatus != null">check_in_status = #{checkInStatus},</if>
+            <if test="checkOutStatus != null">check_out_status = #{checkOutStatus},</if>
+            <if test="attendanceInfoDate != null">attendance_info_date = #{attendanceInfoDate},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="evaluate != null">evaluate = #{evaluate},</if>
+            <if test="goLongitude != null">go_longitude = #{goLongitude},</if>
+            <if test="goLatitude != null">go_latitude = #{goLatitude},</if>
+            <if test="goAddress != null">go_address = #{goAddress},</if>
+            <if test="outLongitude != null">out_longitude = #{outLongitude},</if>
+            <if test="outLatitude != null">out_latitude = #{outLatitude},</if>
+            <if test="outAddress != null">out_address = #{outAddress},</if>
+        </trim>
+        where attendance_info_id = #{attendanceInfoId}
+    </update>
+
+    <delete id="deleteAttendanceInfoByAttendanceInfoId" parameterType="String">
+        delete from attendance_info where attendance_info_id = #{attendanceInfoId}
+    </delete>
+
+    <delete id="deleteAttendanceInfoByAttendanceInfoIds" parameterType="String">
+        delete from attendance_info where attendance_info_id in
+        <foreach item="attendanceInfoId" collection="array" open="(" separator="," close=")">
+            #{attendanceInfoId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAttendanceInfoByEmpId" parameterType="String">
+        delete from attendance_info where emp_id = #{empId}
+    </delete>
+
+    <!-- 查询考勤评价列表 -->
+    <select id="selectAttendanceEvaluationList" resultType="com.ruoyi.attendance.domain.AttendanceEvaluationDTO">
+        SELECT
+            u.nick_name AS employeeName,
+            ai.check_in_time AS checkInTime,
+            ai.check_out_time AS checkOutTime,
+            ai.check_in_status AS checkInStatus,
+            ai.check_out_status AS checkOutStatus,
+            ai.evaluate AS evaluation -- 使用正确的列名并映射到 evaluation 字段
+        FROM
+            attendance_info ai
+        JOIN
+            emp_info e ON ai.emp_id = e.emp_info_id
+        JOIN
+            sys_user u ON e.user_id = u.user_id
+        WHERE
+            u.dept_id IN
+            <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+        AND ai.attendance_info_date = STR_TO_DATE(#{attendanceDate}, '%Y-%m-%d') -- Convert string date to date type for comparison
+        ORDER BY
+            u.dept_id, u.create_time
+    </select>
+
+    <!-- 查询指定员工在指定日期范围内的月度考勤记录 -->
+    <select id="selectMonthlyAttendance" resultMap="AttendanceInfoResult">
+        <include refid="selectAttendanceInfoVo"/>
+        <where>
+            <if test="empId != null and empId != ''">
+                AND emp_id = #{empId}
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND DATE(attendance_info_date) BETWEEN STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+            </if>
+        </where>
+        ORDER BY attendance_info_date ASC
+    </select>
+
+    <!-- 查询指定部门下员工在指定日期范围内的考勤记录 -->
+    <select id="selectMonthlyAttendanceByDept" resultMap="AttendanceInfoResult">
+        SELECT a.*
+        FROM attendance_info a
+        INNER JOIN emp_info e ON a.emp_id = e.emp_info_id
+        WHERE e.dept_id = #{deptId}
+          AND a.attendance_info_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY a.emp_id, a.attendance_info_date
+    </select>
+
+</mapper>
